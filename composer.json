@@ -1,0 +1,33 @@
+{
+    "name": "ashkanab/laravel-in-app-purchase",
+    "description": "Your package description",
+    "license": "MIT",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "AppStore\\InAppPurchase\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ashkan",
+            "email": "ashkanabdollahi19@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^9.0|^10.0|^11.0",
+        "ashkanab/app-store-server-api": "^1.0"
+    },
+    "extra": {
+    "laravel": {
+        "providers": [
+            "AppStore\\InAppPurchase\\PurchaseServiceProvider"
+        ],
+        "aliases": {
+            "Purchase": "AppStore\\InAppPurchase\\PurchaseServiceProvider\\Purchase"
+        }
+    }
+}
+}
