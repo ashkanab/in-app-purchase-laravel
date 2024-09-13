@@ -95,9 +95,14 @@ class AppStorePurchase
         }
 
 
-        $lastTransactionItem = $this->client->getSubscriptions($subscription->org_transaction_id)
-            ->getData()->getLastTransactions($subscription->group_id)[0];
+        $lastTransactions = $this->client->getSubscriptions($subscription->org_transaction_id)
+            ->getData()->getLastTransactions($subscription->group_id);
 
+        if (!$lastTransactions) {
+            return $subscriptionStatus;
+        }
+
+        $lastTransactionItem = $lastTransactions[0];
         $renewalInfo = $lastTransactionItem->getDecodedRenewalInfo();
 
         $subscriptionStatus->setStatus(Status::getNameByValue($lastTransactionItem->getStatus()));
