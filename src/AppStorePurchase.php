@@ -90,19 +90,15 @@ class AppStorePurchase
         );
 
 
-        if($subscriptionStatus->isActive() || !$subscriptionStatus->isExpired()) {
+        if($subscriptionStatus->isActive() && !$subscriptionStatus->isExpired()) {
             return $subscriptionStatus;
         }
 
 
-        $lastTransactions = $this->client->getSubscriptions($subscription->org_transaction_id)
-            ->getData()->getLastTransactions($subscription->group_id);
+        $lastTransactionItem = $this->client->getSubscriptions($subscription->org_transaction_id)
+            ->getData()->getLastTransactions($subscription->group_id)[0];
 
-        if (!$lastTransactions) {
-            return $subscriptionStatus;
-        }
 
-        $lastTransactionItem = $lastTransactions[0];
         $renewalInfo = $lastTransactionItem->getDecodedRenewalInfo();
 
         $subscriptionStatus->setStatus(Status::getNameByValue($lastTransactionItem->getStatus()));
