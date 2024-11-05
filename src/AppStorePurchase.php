@@ -26,7 +26,7 @@ class AppStorePurchase
             ->client();
     }
 
-    private function client(): Client
+    public function client(): Client
     {
         return $this->client;
     }
