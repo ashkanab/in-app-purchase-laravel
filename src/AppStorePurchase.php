@@ -107,6 +107,10 @@ class AppStorePurchase
             Carbon::createFromTimestamp($renewalInfo->getRenewalDate()->getTimestamp())
         );
 
+        if($subscriptionStatus->isActive() && !$subscriptionStatus->isExpired()) {
+            $subscriptionStatus->setWasRecentlyRenewed(true);
+        }
+
         $subscription->update([
             'expire_at' => $subscriptionStatus->getExpireAt(),
             'auto_renewable' => $subscriptionStatus->getAutoRenewable(),
@@ -115,7 +119,4 @@ class AppStorePurchase
 
         return $subscriptionStatus;
     }
-
-
-
 }

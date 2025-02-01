@@ -14,7 +14,8 @@ class SubscriptionStatus
         private readonly ?string $groupId = null,
         private ?bool   $autoRenewable = null,
         private ?Carbon $expireAt = null,
-        private ?string $status = null
+        private ?string $status = null,
+        private bool $wasRecentlyRenewed = false,
     )
     {
     }
@@ -119,5 +120,21 @@ class SubscriptionStatus
     public function setStatus(?string $status): void
     {
         $this->status = $status;
+    }
+
+    /**
+     * @param bool $wasRecentlyRenewed
+     */
+    public function setWasRecentlyRenewed(bool $wasRecentlyRenewed): void
+    {
+        $this->wasRecentlyRenewed = $wasRecentlyRenewed;
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasRecentlyRenewed(): bool
+    {
+        return $this->wasRecentlyRenewed;
     }
 }
