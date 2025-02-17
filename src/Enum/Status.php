@@ -14,6 +14,8 @@ enum Status: int
 
     case Revoked = 5;
 
+    case Consumed = 6;
+
 
     public static function getNameByValue($value): ?string
     {
