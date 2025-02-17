@@ -3,9 +3,10 @@
 namespace AppStore\InAppPurchase\Objects;
 
 use AppStore\InAppPurchase\Enum\Status;
+use AppStore\InAppPurchase\Enum\Type;
 use AppStore\InAppPurchase\Models\Purchase;
 
-class PurchaseStatus
+class PurchaseStatus implements StatusObjectInterface
 {
     public function __construct(
         private readonly ?string $purchaseId = null,
@@ -100,5 +101,12 @@ class PurchaseStatus
     public function isConsumable(): bool
     {
         return $this->isConsumable;
+    }
+
+    public function getType(): Type
+    {
+        return $this->isConsumable() ?
+            Type::Consumable :
+            Type::NonConsumable;
     }
 }

@@ -3,9 +3,10 @@
 namespace AppStore\InAppPurchase\Objects;
 
 use AppStore\InAppPurchase\Enum\Status;
+use AppStore\InAppPurchase\Enum\Type;
 use Carbon\Carbon;
 
-class SubscriptionStatus
+class SubscriptionStatus implements StatusObjectInterface
 {
     public function __construct(
         private readonly ?string $subscriptionId = null,
@@ -136,5 +137,12 @@ class SubscriptionStatus
     public function wasRecentlyRenewed(): bool
     {
         return $this->wasRecentlyRenewed;
+    }
+
+    public function getType(): Type
+    {
+        return $this->autoRenewable ?
+            Type::AutoRenewableSubscription :
+            Type::NonRenewingSubscription;
     }
 }
