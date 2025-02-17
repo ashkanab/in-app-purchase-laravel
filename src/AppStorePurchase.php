@@ -46,7 +46,7 @@ class AppStorePurchase
             userId: $purchase->user_id,
             productId: $purchase->product_id,
             originalTransactionId: $purchase->org_transaction_id,
-            isConsumable: $purchase->isConsumable,
+            isConsumable: $purchase->is_consumable,
             status: Status::getNameByValue($purchase->status),
             quantity: $purchase->quantity
         );
@@ -82,7 +82,7 @@ class AppStorePurchase
             userId: $purchase->user_id,
             productId: $purchase->product_id,
             originalTransactionId: $purchase->org_transaction_id,
-            isConsumable: $purchase->isConsumable,
+            isConsumable: $purchase->is_consumable,
             status: Status::getNameByValue($purchase->status),
             quantity: $purchase->quantity
         );
