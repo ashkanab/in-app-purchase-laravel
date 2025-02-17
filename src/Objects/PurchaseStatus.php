@@ -28,6 +28,8 @@ class PurchaseStatus
         Purchase::where('id', $this->purchaseId)
             ->update(['status' => Status::Consumed->value]);
 
+        $this->status = Status::Consumed->name;
+
         return true;
     }
 
