@@ -3,7 +3,9 @@
 namespace AppStore\InAppPurchase;
 
 use AppStore\InAppPurchase\Enum\Status;
+use AppStore\InAppPurchase\Models\Purchase;
 use AppStore\InAppPurchase\Models\Subscription;
+use AppStore\InAppPurchase\Objects\PurchaseStatus;
 use AppStore\InAppPurchase\Objects\SubscriptionStatus;
 use AshkanAb\AppStore\Client;
 use AshkanAb\AppStore\Factory;
@@ -31,6 +33,61 @@ class AppStorePurchase
         return $this->client;
     }
 
+    public function getPurchaseStatus(string $purchaseId): PurchaseStatus
+    {
+        $purchase = Purchase::find($purchaseId);
+
+        if (!$purchase) {
+            return new PurchaseStatus();
+        }
+
+        return new PurchaseStatus(
+            purchaseId: $purchase->id,
+            userId: $purchase->user_id,
+            productId: $purchase->product_id,
+            originalTransactionId: $purchase->org_transaction_id,
+            isConsumable: $purchase->isConsumable,
+            status: Status::getNameByValue($purchase->status),
+            quantity: $purchase->quantity
+        );
+    }
+
+    public function verifyPurchase(string $purchaseTransactionId, string|int $userId): PurchaseStatus
+    {
+        $transaction = $this->client->getTransactionInfo($purchaseTransactionId)->getDecodedTransactionInfo();
+
+        if ($transaction->isSubscription() || $transaction->getRevocationReason() !== null) {
+            return new PurchaseStatus();
+        }
+
+        $purchase = Purchase::where('org_transaction_id', $transaction->getOriginalTransactionId())->first();
+
+        if (!$purchase) {
+            $purchase = Purchase::create([
+                'user_id' => $userId,
+                'org_transaction_id' => $transaction->getOriginalTransactionId(),
+                'product_id' => $transaction->getProductId(),
+                'quantity' => $transaction->getQuantity(),
+                'is_consumable' => $transaction->isConsumable(),
+                'status' => Status::Active->value,
+            ]);
+
+        }else if ($userId != $purchase->user_id) {
+            return new PurchaseStatus();
+        }
+
+
+        return new PurchaseStatus(
+            purchaseId: $purchase->id,
+            userId: $purchase->user_id,
+            productId: $purchase->product_id,
+            originalTransactionId: $purchase->org_transaction_id,
+            isConsumable: $purchase->isConsumable,
+            status: Status::getNameByValue($purchase->status),
+            quantity: $purchase->quantity
+        );
+    }
+
 
     public function verifySubscription(string $purchaseTransactionId): SubscriptionStatus
     {
@@ -41,7 +98,7 @@ class AppStorePurchase
             return new SubscriptionStatus();
         }
 
-        if ($transaction->isExpired()) {
+        if ($transaction->isExpired() || $transaction->getRevocationReason() !== null) {
             return new SubscriptionStatus();
         }
 
@@ -90,7 +147,7 @@ class AppStorePurchase
         );
 
 
-        if($subscriptionStatus->isActive() && !$subscriptionStatus->isExpired()) {
+        if ($subscriptionStatus->isActive() && !$subscriptionStatus->isExpired()) {
             return $subscriptionStatus;
         }
 
@@ -107,7 +164,7 @@ class AppStorePurchase
             Carbon::createFromTimestamp($renewalInfo->getRenewalDate()->getTimestamp())
         );
 
-        if($subscriptionStatus->isActive() && !$subscriptionStatus->isExpired()) {
+        if ($subscriptionStatus->isActive() && !$subscriptionStatus->isExpired()) {
             $subscriptionStatus->setWasRecentlyRenewed(true);
         }
 
