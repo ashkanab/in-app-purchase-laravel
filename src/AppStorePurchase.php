@@ -105,11 +105,11 @@ class AppStorePurchase
 
         $subscription = Subscription::updateOrCreate(
             [
-                'product_id' => $transaction->getProductId(),
-                'group_id' => $transaction->getSubscriptionGroupIdentifier()
+                'org_transaction_id' => $transaction->getOriginalTransactionId(),
             ],
             [
-                'org_transaction_id' => $transaction->getOriginalTransactionId(),
+                'product_id' => $transaction->getProductId(),
+                'group_id' => $transaction->getSubscriptionGroupIdentifier(),
                 'expire_at' => $transaction->getExpiresDate(),
                 'auto_renewable' => $transaction->getType() === 'Auto-Renewable Subscription',
                 'status' => Status::Active->value,
